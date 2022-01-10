@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+    --main: #202124;
+    --main-darker: #1e1e1e;
+    --secondary: #303134;
+}
+
+.bg-main{
+    background-color: var(--main);
+}
+
+.bg-main-darker{
+    background-color: var(--main-darker);
+}
+
+.bg-secondary{
+    background-color: var(--secondary);
+}
+
+.reflex-splitter{
+    border-color: #303030 !important;
+}

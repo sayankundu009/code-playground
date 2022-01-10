@@ -1,0 +1,8 @@
+.menu li a:active{
+    --tw-bg-opacity: 0.1;
+    background-color: hsla(var(--bc) / var(--tw-bg-opacity, 1));
+}
+.menu li a.selected{
+    --tw-bg-opacity: 0.1;
+    background-color: hsla(var(--bc) / var(--tw-bg-opacity, 1));
+}

@@ -1,12 +1,12 @@
 import { PropsWithChildren, ReactNode } from "react";
 import { FileStructureProps } from "../../types";
-import { File as FileType } from "../../../../../../store/editor/files/types";
+import { Structure } from "../../../../../../store/editor/files/types";
 import File from "../File";
 import Folder from "../Folder";
 
 export default function FileStructure({ files = [], onFileSelect = () => { } }: PropsWithChildren<FileStructureProps>): ReactNode | any {
 
-    function handleFileSelect(fileItem: FileType) {
+    function handleFileSelect(fileItem: Structure) {
         onFileSelect(fileItem)
     }
 

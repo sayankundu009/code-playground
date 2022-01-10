@@ -6,7 +6,7 @@ export type FileIconProps = {
 
 export type FileStructureProps = {
     files: Array<Structure>;
-    onFileSelect: (file: File) => void;
+    onFileSelect: (file: Structure) => void;
 }
 
 export type FolderProps = {

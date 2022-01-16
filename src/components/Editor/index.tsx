@@ -51,7 +51,7 @@ export default function Editor() {
             <Activitybar />
             <section className="h-screen w-full">
                 <Navbar />
-                <section style={{ height: "calc(100% - 65px)" }}>
+                <section style={{ height: "calc(100% - 3rem)" }}>
                     <ReflexContainer orientation="vertical">
                         <ReflexElement className="left-pane" maxSize={250}>
                             <FileExplorer />

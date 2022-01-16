@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useFileStore from "../../../../store/editor/files"
-import { Structure } from "../../../../store/editor/files/types";
+import { FileContent, Structure } from "../../../../store/editor/files/types";
 import { getFileExtension } from "../../../../utils";
+import Addressbar from "./components/Addressbar";
+import Preview from "./components/Preview";
 
 function constructPath(files: Array<Structure>, path: string = "", pathObject: { [key: string]: string } = {}) {
     files.forEach((file) => {
@@ -21,9 +23,17 @@ function constructDataURL({ content = "", extension = "plain" }: { content: stri
 
 export default function Browser() {
     const { files, fileContents } = useFileStore(({ files, fileContents }) => ({ files, fileContents }));
-    const [previewCode, setPreviewCode] = useState("");
+    const channel = useRef<BroadcastChannel | null>(null)
+    const previewWindow = useRef<Window | null>(null);
 
-    function resolveResource(url: string) {
+    function sendMessage(action: string, payload: any = {}) {
+        channel.current?.postMessage({
+            action,
+            payload,
+        })
+    }
+
+    function resolveResource(url: string, files: Array<Structure>, fileContents: FileContent) {
         const pathName = new URL(url).pathname;
 
         const filePathStructure = constructPath(files);
@@ -45,17 +55,19 @@ export default function Browser() {
         return null;
     }
 
-    function setupPreview(currentFile = "index.html") {
-        if(!fileContents[currentFile]) return;
+    function getContent(currentFile = "index.html") {
+        const { files, fileContents } = useFileStore.getState();
+
+        if (!fileContents[currentFile]) return;
 
         const domParser = new DOMParser();
 
-        const doc = domParser.parseFromString(fileContents[currentFile], "text/html")
+        const doc = domParser.parseFromString(fileContents[currentFile], "text/html");
 
         Array.from(doc.querySelectorAll("link[rel^='stylesheet']")).map((linkTag) => {
             const href = (linkTag as HTMLLinkElement).href;
 
-            const dataURL = resolveResource(href);
+            const dataURL = resolveResource(href, files, fileContents);
 
             if (dataURL) {
                 (linkTag as HTMLLinkElement).href = dataURL;
@@ -64,23 +76,62 @@ export default function Browser() {
 
         Array.from(doc.querySelectorAll("script")).map((scriptTag) => {
             const src = (scriptTag as HTMLScriptElement).src;
-            const dataURL = resolveResource(src);
+            const dataURL = resolveResource(src, files, fileContents);
 
             if (dataURL) {
                 (scriptTag as HTMLScriptElement).src = dataURL;
             }
         });
 
-        setPreviewCode(doc.documentElement.outerHTML);
+        return doc.documentElement.outerHTML
+    }
+
+    function openPreviewWindow() {
+        if (previewWindow.current && !previewWindow.current?.closed) {
+            previewWindow.current.focus()
+        } else {
+            previewWindow.current = window.open("/preview/")
+        }
+    }
+
+    function setupPreview() {
+        reloadPreview();
+    }
+
+    function reloadPreview() {
+        const content = getContent();
+
+        sendMessage("RENDER", {
+            type: "html",
+            content,
+        });
     }
 
     useEffect(() => {
-        setupPreview();
+        channel.current = new BroadcastChannel("code-playground");
+
+        channel.current.addEventListener("message", ({ data }) => {
+            switch (data.action) {
+                case "INIT": {
+                    setupPreview();
+                    break;
+                }
+            }
+        });
+
+        return () => {
+            channel.current?.close();
+        }
+    }, []);
+
+    useEffect(() => {
+        reloadPreview();
     }, [fileContents, files]);
 
     return (
         <div className="h-full w-full">
-            <iframe className="h-full w-full" srcDoc={previewCode}></iframe>
+            <Addressbar reloadPreview={reloadPreview} openPreviewWindow={openPreviewWindow} />
+            <Preview />
         </div>
     )
 }

@@ -1,6 +1,6 @@
 import { PropsWithChildren, ReactNode } from "react";
+import { Structure } from "../../../../../../types";
 import { FileStructureProps } from "../../types";
-import { Structure } from "../../../../../../store/editor/files/types";
 import File from "../File";
 import Folder from "../Folder";
 

@@ -1,11 +1,11 @@
-import { Structure, File } from "../../../../../store/editor/files/types";
+import { Structure, StructureList } from "../../../../../types"
 
 export type FileIconProps = {
     type: string;
 }
 
 export type FileStructureProps = {
-    files: Array<Structure>;
+    files:StructureList;
     onFileSelect: (file: Structure) => void;
 }
 

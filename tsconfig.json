@@ -20,5 +20,6 @@
     ],
     "baseUrl": "src"
   },
-  "include": ["./src", "./preview"]
+  "include": ["./src", "./preview", "./public"],
+  "exclude": ["node_modules/**/*"]
 }

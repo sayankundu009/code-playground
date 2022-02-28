@@ -14,7 +14,7 @@ export function getLanguage(name: string){
 }
 
 export function debounce(callback: (...args: any[]) => void, delay: number = 400) {
-    let timer: number = 0;
+    let timer: ReturnType<typeof setTimeout>;
     
     let debounced = function (...args: any[]) {
         clearTimeout(timer);

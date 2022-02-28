@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import useFileStore from "../../../../store/editor/files"
-import { FileContent, Structure } from "../../../../store/editor/files/types";
-import { getFileExtension } from "../../../../utils";
-import Addressbar from "./components/Addressbar";
 import Preview from "./components/Preview";
+import Addressbar from "./components/Addressbar";
+import { useEffect, useRef } from "react";
+import { useFileContents, useFiles } from "../../../../store/selectors/editor";
+import { FileContent, StructureList } from "../../../../types";
+import { getFileExtension } from "../../../../utils";
+import { store } from "../../../../store"
 
-function constructPath(files: Array<Structure>, path: string = "", pathObject: { [key: string]: string } = {}) {
+function constructPath(files: StructureList, path: string = "", pathObject: { [key: string]: string } = {}) {
     files.forEach((file) => {
         if (file.type == "folder") {
             pathObject = constructPath(file.children || [], `${path}/${file.name}`, pathObject)
@@ -22,7 +23,9 @@ function constructDataURL({ content = "", extension = "plain" }: { content: stri
 }
 
 export default function Browser() {
-    const { files, fileContents } = useFileStore(({ files, fileContents }) => ({ files, fileContents }));
+    const { files } = useFiles();
+    const fileContents = useFileContents();
+
     const channel = useRef<BroadcastChannel | null>(null)
     const previewWindow = useRef<Window | null>(null);
 
@@ -33,7 +36,7 @@ export default function Browser() {
         })
     }
 
-    function resolveResource(url: string, files: Array<Structure>, fileContents: FileContent) {
+    function resolveResource(url: string, files: StructureList, fileContents: FileContent) {
         const pathName = new URL(url).pathname;
 
         const filePathStructure = constructPath(files);
@@ -56,7 +59,7 @@ export default function Browser() {
     }
 
     function getContent(currentFile = "index.html") {
-        const { files, fileContents } = useFileStore.getState();
+        const { files, fileContents } = store.getState().editor;
 
         if (!fileContents[currentFile]) return;
 

@@ -13,13 +13,14 @@ import {
 import 'react-reflex/styles.css';
 
 import { useEffect } from "react";
-import useFileStore from "../../store/editor/files"
-import { Structure } from "../../store/editor/files/types"
+import { useDispatch } from "react-redux";
+import { setFileContent, setFiles } from "../../store/slices/editor";
+import { StructureList } from "../../types";
 
 export default function Editor() {
-    const { setFiles, setFileContent, fileContents } = useFileStore(state => state);
+    const dispatch = useDispatch();
 
-    function setupFiles(files: Array<Structure>): Array<Structure> {
+    function setupFiles(files: StructureList): StructureList {
         return files.map(file => {
             if (file.type == "folder") {
                 return {
@@ -27,9 +28,9 @@ export default function Editor() {
                     children: setupFiles(file.children || []),
                 }
             } else {
-                const { content, ...restFile } = file;
+                const { content = "", ...restFile } = file;
 
-                setFileContent(file.name, content || "");
+                dispatch(setFileContent({ name: file.name, content }));
 
                 return {
                     ...restFile,
@@ -41,8 +42,8 @@ export default function Editor() {
     useEffect(() => {
         fetch("/project.json").then(res => res.json()).then(data => {
             const fileStructure = setupFiles(data);
-            
-            setFiles(fileStructure);
+
+            dispatch(setFiles(fileStructure))
         });
     }, []);
 

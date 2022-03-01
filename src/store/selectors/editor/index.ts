@@ -2,11 +2,12 @@ import useAppSelector from "../../../hooks/useAppSelector";
 
 export function useFiles() {
     const files = useAppSelector(({ editor }) => {
-        const { currentSelectedFile, files } = editor;
+        const { currentSelectedFile, files, isFilesLoaded } = editor;
 
         return {
+            files,
+            isFilesLoaded,
             currentSelectedFile,
-            files
         }
     });
 

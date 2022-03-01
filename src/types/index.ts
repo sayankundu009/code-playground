@@ -21,4 +21,5 @@ export type EditorState = {
     files: StructureList,
     currentSelectedFile: File | null,
     fileContents: FileContent,
+    isFilesLoaded: boolean,
 }

@@ -10,15 +10,31 @@ import {
     ReflexElement
 } from 'react-reflex';
 
-import 'react-reflex/styles.css';
-
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { setFileContent, setFiles } from "../../store/slices/editor";
-import { StructureList } from "../../types";
+import { setFileContent, setFiles, setIsFilesLoaded } from "../../store/slices/editor";
+import { FileContent, StructureList } from "../../types";
+import { useFileContents, useFiles } from "../../store/selectors/editor";
+import { addToHeadStart, constructPath, getFileExtension, isFilePath, logRequests } from "../../utils";
+
+import 'react-reflex/styles.css';
 
 export default function Editor() {
     const dispatch = useDispatch();
+    const fileContentsRef = useRef<FileContent>({});
+    const filePaths = useRef<{ [key: string]: string }>({});
+    const { files } = useFiles();
+    const fileContents = useFileContents();
+
+    function setupProjectFiles() {
+        fetch("/projects/get-started.json").then(res => res.json()).then(data => {
+            const fileStructure = setupFiles(data);
+
+            dispatch(setFiles(fileStructure))
+
+            dispatch(setIsFilesLoaded(true));
+        });
+    }
 
     function setupFiles(files: StructureList): StructureList {
         return files.map(file => {
@@ -39,13 +55,79 @@ export default function Editor() {
         })
     }
 
-    useEffect(() => {
-        fetch("/project.json").then(res => res.json()).then(data => {
-            const fileStructure = setupFiles(data);
+    function getFileNameFromPath(path: string = "") {
+        const isFile = isFilePath(path);
 
-            dispatch(setFiles(fileStructure))
+        if (!isFile) path = (new URL("/" + "index.html", "https://test")).pathname;
+
+        return filePaths.current[path] || "";
+    }
+
+    function getFileContent(name: string = "") {
+        return fileContentsRef.current[name] || null;
+    }
+
+    function setupServiceWorkerBroadcastChannel() {
+        const serviceWorkerChannel = new BroadcastChannel("service-worker-channel");
+
+        serviceWorkerChannel.addEventListener("message", (event) => {
+            const { id, type, payload } = event.data;
+
+            switch (type) {
+                case "GET_FILE_CONTENT": {
+                    const { path = "/" } = payload;
+
+                    const fileName = getFileNameFromPath(path);
+
+                    let content = getFileContent(fileName);
+
+                    const status = content == null ? 404 : 200;
+
+                    if (content !== null) {
+                        const extension = getFileExtension(fileName);
+
+                        switch (extension) {
+                            case "html": {
+                                content = addToHeadStart(`<script src="/js/inject.js"></script>`, content);
+                            }
+                        }
+                    }
+
+                    logRequests({ path, status });
+
+                    serviceWorkerChannel.postMessage({
+                        id,
+                        payload: {
+                            status,
+                            content,
+                        }
+                    });
+                }
+            }
         });
+
+        return () => {
+            serviceWorkerChannel.close();
+        }
+    }
+
+    useEffect(() => {
+        setupProjectFiles();
+
+        const serviceWorkerChannelCleanup = setupServiceWorkerBroadcastChannel();
+
+        return () => {
+            serviceWorkerChannelCleanup();
+        }
     }, []);
+
+    useEffect(() => {
+        fileContentsRef.current = fileContents;
+    }, [fileContents]);
+
+    useEffect(() => {
+        filePaths.current = constructPath(files);
+    }, [files]);
 
     return (
         <section className="flex flex-row">

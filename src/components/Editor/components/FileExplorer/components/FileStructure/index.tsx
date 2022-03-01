@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { Structure } from "../../../../../../types";
 import { FileStructureProps } from "../../types";
 import File from "../File";
@@ -10,16 +10,31 @@ export default function FileStructure({ files = [], onFileSelect = () => { } }: 
         onFileSelect(fileItem)
     }
 
+    console.log(files);
+
+    const sortedFiles = useMemo(() => {
+        return [...files].sort((fileOne, fileTwo) => {
+            if (fileOne.type === "folder") {
+                if (fileTwo.type === "folder") return fileOne.name.localeCompare(fileTwo.name);
+
+                return 1
+            } else if (fileOne.type == "file") {
+                if (fileTwo.type === "file") return fileOne.name.localeCompare(fileTwo.name);
+
+                return 1
+            }
+
+            return 0;
+        })
+    }, [files]);
+
     return (
-        <ul className="menu text-white">
-            {files.map((file) => {
+        <ul className="menu text-white text-sm">
+            {sortedFiles.map((file) => {
                 if (file.type == "folder") {
                     return (
                         <Folder name={file.name} key={file.name}>
-                            <FileStructure
-                                files={file.children || []}
-                                onFileSelect={onFileSelect}
-                            />
+                            <FileStructure files={file.children || []} onFileSelect={onFileSelect} />
                         </Folder>
                     )
                 } else {

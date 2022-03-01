@@ -5,6 +5,7 @@ const initialState: EditorState = {
     files: [],
     currentSelectedFile: null,
     fileContents: {},
+    isFilesLoaded: false,
 }
 
 export const editorSlice = createSlice({
@@ -24,6 +25,9 @@ export const editorSlice = createSlice({
                 ...state.fileContents,
                 [name]: content,
             }
+        },
+        setIsFilesLoaded(state, action: PayloadAction<boolean>){
+            state.isFilesLoaded = action.payload;
         }
     },
 });
@@ -31,7 +35,8 @@ export const editorSlice = createSlice({
 export const { 
     setCurrentSelectedFile, 
     setFiles, 
-    setFileContent 
+    setFileContent,
+    setIsFilesLoaded,
 } = editorSlice.actions
 
 export default editorSlice.reducer

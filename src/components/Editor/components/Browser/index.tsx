@@ -2,28 +2,9 @@ import Preview from "./components/Preview";
 import Addressbar from "./components/Addressbar";
 import { useEffect, useRef } from "react";
 import { useFileContents, useFiles } from "../../../../store/selectors/editor";
-import { FileContent, StructureList } from "../../../../types";
-import { getFileExtension } from "../../../../utils";
-import { store } from "../../../../store"
-
-function constructPath(files: StructureList, path: string = "", pathObject: { [key: string]: string } = {}) {
-    files.forEach((file) => {
-        if (file.type == "folder") {
-            pathObject = constructPath(file.children || [], `${path}/${file.name}`, pathObject)
-        } else {
-            pathObject[`${path}/${file.name}`] = file.name;
-        }
-    });
-
-    return pathObject;
-}
-
-function constructDataURL({ content = "", extension = "plain" }: { content: string, extension: string }) {
-    return `data:text/${extension};base64,${btoa(content)}`
-}
 
 export default function Browser() {
-    const { files } = useFiles();
+    const { files, isFilesLoaded } = useFiles();
     const fileContents = useFileContents();
 
     const channel = useRef<BroadcastChannel | null>(null)
@@ -36,59 +17,6 @@ export default function Browser() {
         })
     }
 
-    function resolveResource(url: string, files: StructureList, fileContents: FileContent) {
-        const pathName = new URL(url).pathname;
-
-        const filePathStructure = constructPath(files);
-
-        const fileName = filePathStructure[pathName];
-
-        if (fileName) {
-            const content = fileContents[fileName];
-            const extension = getFileExtension(fileName)
-
-            const dataURL = constructDataURL({
-                content: content || "",
-                extension,
-            });
-
-            return dataURL;
-        }
-
-        return null;
-    }
-
-    function getContent(currentFile = "index.html") {
-        const { files, fileContents } = store.getState().editor;
-
-        if (!fileContents[currentFile]) return;
-
-        const domParser = new DOMParser();
-
-        const doc = domParser.parseFromString(fileContents[currentFile], "text/html");
-
-        Array.from(doc.querySelectorAll("link[rel^='stylesheet']")).map((linkTag) => {
-            const href = (linkTag as HTMLLinkElement).href;
-
-            const dataURL = resolveResource(href, files, fileContents);
-
-            if (dataURL) {
-                (linkTag as HTMLLinkElement).href = dataURL;
-            }
-        });
-
-        Array.from(doc.querySelectorAll("script")).map((scriptTag) => {
-            const src = (scriptTag as HTMLScriptElement).src;
-            const dataURL = resolveResource(src, files, fileContents);
-
-            if (dataURL) {
-                (scriptTag as HTMLScriptElement).src = dataURL;
-            }
-        });
-
-        return doc.documentElement.outerHTML
-    }
-
     function openPreviewWindow() {
         if (previewWindow.current && !previewWindow.current?.closed) {
             previewWindow.current.focus()
@@ -97,30 +25,12 @@ export default function Browser() {
         }
     }
 
-    function setupPreview() {
-        reloadPreview();
-    }
-
     function reloadPreview() {
-        const content = getContent();
-
-        sendMessage("RENDER", {
-            type: "html",
-            content,
-        });
+        sendMessage("RELOAD")
     }
 
     useEffect(() => {
-        channel.current = new BroadcastChannel("code-playground");
-
-        channel.current.addEventListener("message", ({ data }) => {
-            switch (data.action) {
-                case "INIT": {
-                    setupPreview();
-                    break;
-                }
-            }
-        });
+        channel.current = new BroadcastChannel("code-playground-preview");
 
         return () => {
             channel.current?.close();
@@ -128,13 +38,13 @@ export default function Browser() {
     }, []);
 
     useEffect(() => {
-        reloadPreview();
-    }, [fileContents, files]);
+        isFilesLoaded && reloadPreview();
+    }, [fileContents, files, isFilesLoaded]);
 
     return (
         <div className="h-full w-full">
             <Addressbar reloadPreview={reloadPreview} openPreviewWindow={openPreviewWindow} />
-            <Preview />
+            {isFilesLoaded && <Preview />}
         </div>
     )
 }

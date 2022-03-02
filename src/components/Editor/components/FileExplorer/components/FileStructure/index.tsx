@@ -5,12 +5,9 @@ import File from "../File";
 import Folder from "../Folder";
 
 export default function FileStructure({ files = [], onFileSelect = () => { } }: PropsWithChildren<FileStructureProps>): ReactNode | any {
-
     function handleFileSelect(fileItem: Structure) {
         onFileSelect(fileItem)
     }
-
-    console.log(files);
 
     const sortedFiles = useMemo(() => {
         return [...files].sort((fileOne, fileTwo) => {

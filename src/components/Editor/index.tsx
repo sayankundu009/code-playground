@@ -30,7 +30,7 @@ export default function Editor() {
         fetch("/projects/get-started.json").then(res => res.json()).then(data => {
             const fileStructure = setupFiles(data);
 
-            dispatch(setFiles(fileStructure))
+            dispatch(setFiles(fileStructure));
 
             dispatch(setIsFilesLoaded(true));
         });

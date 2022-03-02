@@ -1,5 +1,13 @@
 import { StructureList } from "../types";
 
+export function log(...args: any[]) {
+    const isDev = import.meta.env.DEV;
+
+    if (isDev) {
+        console.log(...args)
+    }
+}
+
 export function getFileExtension(name: string = ""): string {
     return name.slice((name.lastIndexOf(".") - 1 >>> 0) + 2) || "";
 }
@@ -67,4 +75,21 @@ export function logRequests({ path, status }: { path: string, status: number }) 
     const color = status == 200 ? "#16a34a" : "#ef4444";
 
     console.log(`%c${status}%c ${path}`, `color:white;background:${color};padding: 2px;border-radius: 5px`, "color: #fde047;")
+}
+
+export function onIframeReady(iframe: HTMLIFrameElement | null) {
+    return new Promise<void>((resolve, reject) => {
+        const timer = setInterval(() => {
+            try {
+                if (iframe && iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                    clearInterval(timer);
+                    resolve();
+                }
+            } catch (err) {
+                clearInterval(timer);
+                console.log(err);
+                reject();
+            }
+        }, 10);
+    })
 }

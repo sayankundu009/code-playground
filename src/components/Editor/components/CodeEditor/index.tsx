@@ -17,8 +17,8 @@ export default function CodeEditor() {
     const { currentSelectedFile } = useFiles();
     const dispatch = useDispatch();
 
-    const handleUpdateFileContent = useDebounce((name, content) => {
-        dispatch(setFileContent({ name, content }))
+    const handleUpdateFileContent = useDebounce((path, content) => {
+        dispatch(setFileContent({ path, content }))
     }, 500);
 
     const editorRef = useRef<any | null>(null);
@@ -29,7 +29,7 @@ export default function CodeEditor() {
 
     function editorOnChange(value: string = "") {
         if (currentSelectedFile) {
-            handleUpdateFileContent(currentSelectedFile.name, value)
+            handleUpdateFileContent(currentSelectedFile.path, value)
         }
     }
 

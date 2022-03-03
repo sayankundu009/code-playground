@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { EditorState, File, StructureList } from '../../../types';
+import { EditorState, File, FileContent, StructureList } from '../../../types';
 
 const initialState: EditorState = {
     files: [],
@@ -18,13 +18,16 @@ export const editorSlice = createSlice({
         setFiles(state, action: PayloadAction<StructureList>) {
             state.files = [...action.payload];
         },
-        setFileContent(state, action: PayloadAction<{ name: string, content: string }>) {
-            const { name, content } = action.payload;
+        setFileContent(state, action: PayloadAction<{ path: string, content: string }>) {
+            const { path, content } = action.payload;
 
             state.fileContents = {
                 ...state.fileContents,
-                [name]: content,
+                [path]: content,
             }
+        },
+        setFileContents(state, action: PayloadAction<FileContent>) {
+            state.fileContents = {...action.payload}
         },
         setIsFilesLoaded(state, action: PayloadAction<boolean>){
             state.isFilesLoaded = action.payload;
@@ -36,6 +39,7 @@ export const {
     setCurrentSelectedFile, 
     setFiles, 
     setFileContent,
+    setFileContents,
     setIsFilesLoaded,
 } = editorSlice.actions
 

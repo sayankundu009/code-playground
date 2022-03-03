@@ -1,5 +1,7 @@
 import { StructureList } from "../types";
 
+export const PREVIEW_URL_PREFIX = "/preview";
+
 export function log(...args: any[]) {
     const isDev = import.meta.env.DEV;
 
@@ -92,4 +94,8 @@ export function onIframeReady(iframe: HTMLIFrameElement | null) {
             }
         }, 10);
     })
+}
+
+export function removeTrailingSlash(path = ""){
+    return path.replace(/\/$/, "") || "/";
 }

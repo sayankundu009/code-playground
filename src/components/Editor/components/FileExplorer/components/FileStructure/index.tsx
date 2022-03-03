@@ -4,9 +4,12 @@ import { FileStructureProps } from "../../types";
 import File from "../File";
 import Folder from "../Folder";
 
-export default function FileStructure({ files = [], onFileSelect = () => { } }: PropsWithChildren<FileStructureProps>): ReactNode | any {
-    function handleFileSelect(fileItem: Structure) {
-        onFileSelect(fileItem)
+export default function FileStructure({ files = [], onFileSelect = () => { }, path = "" }: PropsWithChildren<FileStructureProps>): ReactNode | any {
+    function handleFileSelect(file: Structure) {
+        onFileSelect({
+            name: file.name,
+            path: `${path}/${file.name}`
+        })
     }
 
     const sortedFiles = useMemo(() => {
@@ -31,7 +34,7 @@ export default function FileStructure({ files = [], onFileSelect = () => { } }: 
                 if (file.type == "folder") {
                     return (
                         <Folder name={file.name} key={file.name}>
-                            <FileStructure files={file.children || []} onFileSelect={onFileSelect} />
+                            <FileStructure files={file.children || []} onFileSelect={onFileSelect} path={`${path}/${file.name}`} />
                         </Folder>
                     )
                 } else {

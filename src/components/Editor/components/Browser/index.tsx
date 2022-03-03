@@ -2,7 +2,7 @@ import Preview from "./components/Preview";
 import Addressbar from "./components/Addressbar";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFileContents, useFiles } from "../../../../store/selectors/editor";
-import { onIframeReady } from "../../../../utils";
+import { onIframeReady, PREVIEW_URL_PREFIX, removeTrailingSlash } from "../../../../utils";
 
 export default function Browser() {
     const { files, isFilesLoaded } = useFiles();
@@ -12,6 +12,7 @@ export default function Browser() {
     const previewWindow = useRef<Window | null>(null);
     const iframe = useRef<HTMLIFrameElement | null>(null);
     const [isIframeLoaded, setIsIframeLoaded] = useState(false);
+    const [currentUrlPath, setCurrentUrlPath] = useState("/");
 
     function sendMessage(action: string, payload: any = {}) {
         channel.current?.postMessage({
@@ -24,18 +25,18 @@ export default function Browser() {
         if (previewWindow.current && !previewWindow.current?.closed) {
             previewWindow.current.focus()
         } else {
-            previewWindow.current = window.open("/preview/")
+            previewWindow.current = window.open(`${PREVIEW_URL_PREFIX}${currentUrlPath}`)
         }
     }
 
-    function setIsIframeLoadEventListener(){
+    function setIsIframeLoadEventListener() {
         if (iframe && iframe.current) {
             iframe.current.contentWindow?.addEventListener("unload", handleIframeLoad);
         }
     }
 
     function handleIframeLoad() {
-        if(iframe.current){
+        if (iframe.current) {
             setIsIframeLoaded(false);
 
             onIframeReady(iframe.current).then(() => {
@@ -43,11 +44,45 @@ export default function Browser() {
 
                 setIsIframeLoadEventListener();
             });
+
+            setTimeout(handlePreviewUrlChange, 0);
+        }
+    }
+
+    function handlePreviewUrlChange() {
+        if (iframe.current) {
+            const path = iframe.current.contentWindow?.location.pathname || "";
+
+            const isPreviewPath = path.startsWith(PREVIEW_URL_PREFIX);
+
+            if (isPreviewPath) {
+                const normalizedPath = removeTrailingSlash(path.replace(PREVIEW_URL_PREFIX, "") || "/");
+
+                setCurrentUrlPath(normalizedPath);
+            }
+        }
+    }
+
+    function reloadIframe() {
+        if (iframe.current && iframe.current.contentWindow) {
+            iframe.current.contentWindow.location.reload();
         }
     }
 
     function reloadPreview() {
         sendMessage("RELOAD");
+        reloadIframe();
+    }
+
+    function navigateToPreview(path: string) {
+        if (iframe.current && iframe.current.contentWindow) {
+            iframe.current.contentWindow.location.href = `${PREVIEW_URL_PREFIX}${path}`;
+        }
+    }
+
+    function handleUrlNavigation(path: string) {
+        setCurrentUrlPath(path);
+        navigateToPreview(path);
     }
 
     function stopPreviewReload() {
@@ -82,9 +117,11 @@ export default function Browser() {
                 reloadPreview={reloadPreview}
                 stopPreviewReload={stopPreviewReload}
                 openPreviewWindow={openPreviewWindow}
+                currentUrlPath={currentUrlPath}
+                navigateToPreview={handleUrlNavigation}
             />
 
-            {isFilesLoaded && <Preview ref={onIframeMount}/>}
+            {isFilesLoaded && <Preview ref={onIframeMount} />}
         </div>
     )
 }

@@ -1,5 +1,7 @@
 const serviceWorkerChannel = new BroadcastChannel("service-worker-channel");
 
+const PREVIEW_URL_PREFIX = "/preview";
+
 function request(type, payload) {
     const id = `${Date.now()}-${Math.random()}`;
 
@@ -37,6 +39,10 @@ function getFileMimeType(path = "") {
     return getMimeType(getFileExtension(path));
 }
 
+function removeTrailingSlash(path = ""){
+    return path.replace(/\/$/, "") || "/";
+}
+
 self.addEventListener('install', event => {
     console.log("Installed");
     self.skipWaiting();
@@ -49,10 +55,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const requestURL = new URL(event.request.url);
     const path = requestURL.pathname;
-    const isPreviewPath = path.startsWith("/preview");
+    const isPreviewPath = path.startsWith(PREVIEW_URL_PREFIX);
 
     if (isPreviewPath) {
-        const normalizedPath = path.replace("/preview", "") || "/";
+        const normalizedPath = removeTrailingSlash(path.replace(PREVIEW_URL_PREFIX, "") || "/");
 
         const respond = request("GET_FILE_CONTENT", { path: normalizedPath }).then(data => {
             const content = data ? data.content : null;

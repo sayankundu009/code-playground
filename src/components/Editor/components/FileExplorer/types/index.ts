@@ -5,8 +5,9 @@ export type FileIconProps = {
 }
 
 export type FileStructureProps = {
-    files:StructureList;
-    onFileSelect: (file: Structure) => void;
+    files: StructureList;
+    path?: string;
+    onFileSelect: (file: { name: string, path: string }) => void;
 }
 
 export type FolderProps = {

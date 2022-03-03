@@ -16,18 +16,19 @@ export default function FileExplorer() {
         return fileContents[key] || "";
     }
 
-    const onFileSelect = useCallback((file) => {
+    const onFileSelect = useCallback((file: {name: string, path: string}) => {
         dispatch(setCurrentSelectedFile({
             name: file.name,
             language: getLanguage(file.name),
-            content: getFileContent(file.name),
+            content: getFileContent(file.path),
+            path: file.path,
         }));
     }, [fileContents]);
 
     return (
         <div className="h-full bg-main overflow-hidden" style={{ userSelect: "none" }}>
             <div className="py-4" style={{ width: "calc(100% + 200px)" }}>
-                <FileStructure files={files} onFileSelect={onFileSelect} />
+                <FileStructure files={files} onFileSelect={onFileSelect}/>
             </div>
         </div>
     )

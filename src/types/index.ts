@@ -15,6 +15,7 @@ export type File = {
     name: string,
     content: string,
     language: string,
+    path?: string
 }
 
 export type EditorState = {

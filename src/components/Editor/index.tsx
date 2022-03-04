@@ -10,41 +10,134 @@ import {
     ReflexElement
 } from 'react-reflex';
 
+import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { setFileContents, setFiles, setIsFilesLoaded } from "../../store/slices/editor";
+import { FileContent, StructureList } from "../../types";
+import { useFileContents } from "../../store/selectors/editor";
+import { addToHeadStart, getFileExtension, isFilePath, logRequests } from "../../utils";
+
 import 'react-reflex/styles.css';
 
-import { useEffect } from "react";
-import useFileStore from "../../store/editor/files"
-import { Structure } from "../../store/editor/files/types"
+function setupFiles(files: StructureList): { fileStructure: StructureList, fileContentStructure: FileContent } {
+    const fileContentStructure: FileContent = {};
 
-export default function Editor() {
-    const { setFiles, setFileContent, fileContents } = useFileStore(state => state);
-
-    function setupFiles(files: Array<Structure>): Array<Structure> {
+    function constructFolderStructure(files: StructureList, path: string = ""): StructureList {
         return files.map(file => {
             if (file.type == "folder") {
                 return {
                     ...file,
-                    children: setupFiles(file.children || []),
+                    children: constructFolderStructure(file.children || [], `${path}/${file.name}`),
                 }
             } else {
-                const { content, ...restFile } = file;
+                const { content = "", ...restFile } = file;
 
-                setFileContent(file.name, content || "");
+                fileContentStructure[`${path}/${file.name}`] = content
 
                 return {
                     ...restFile,
                 }
             }
-        })
+        });
+    }
+
+    const fileStructure: any = constructFolderStructure(files);
+
+    return { fileStructure, fileContentStructure };
+}
+
+export default function Editor() {
+    const dispatch = useDispatch();
+    const fileContentsRef = useRef<FileContent>({});
+    const fileContents = useFileContents();
+
+    function setupProjectFiles() {
+        fetch("/projects/get-started.json").then(res => res.json()).then(data => {
+            const { fileStructure, fileContentStructure } = setupFiles(data);
+
+            dispatch(setFiles(fileStructure));
+
+            dispatch(setFileContents(fileContentStructure));
+
+            dispatch(setIsFilesLoaded(true));
+        });
+    }
+
+    function getResourcePath(path: string = "") {
+        const isFile = isFilePath(path);
+
+        if (!isFile) path = (new URL(path + "index.html", "https://example.com")).pathname;
+
+        return path;
+    }
+
+    function getFileContent(path: string = "") {
+        return fileContentsRef.current[path] || null;
+    }
+
+    function getFileDetails(path: string = ""): { content: string | null, extension: string } {
+        const resourcePath = getResourcePath(path);
+
+        let content = getFileContent(resourcePath);
+
+        const extension = getFileExtension(resourcePath);
+
+        return { content, extension }
+    }
+
+    function setupServiceWorkerBroadcastChannel() {
+        const serviceWorkerChannel = new BroadcastChannel("service-worker-channel");
+
+        serviceWorkerChannel.addEventListener("message", (event) => {
+            const { id, type, payload } = event.data;
+
+            switch (type) {
+                case "GET_FILE_CONTENT": {
+                    const { path = "/" } = payload;
+
+                    let { content, extension } = getFileDetails(path);
+
+                    const status = content == null ? 404 : 200;
+
+                    if (content !== null) {
+                        switch (extension) {
+                            case "html": {
+                                content = addToHeadStart(`<script src="/js/inject.js"></script>`, content);
+                            }
+                        }
+                    }
+
+                    serviceWorkerChannel.postMessage({
+                        id,
+                        payload: {
+                            status,
+                            content,
+                        }
+                    });
+
+                    logRequests({ path, status });
+                }
+            }
+        });
+
+        return () => {
+            serviceWorkerChannel.close();
+        }
     }
 
     useEffect(() => {
-        fetch("/project.json").then(res => res.json()).then(data => {
-            const fileStructure = setupFiles(data);
-            
-            setFiles(fileStructure);
-        });
+        setupProjectFiles();
+
+        const serviceWorkerChannelCleanup = setupServiceWorkerBroadcastChannel();
+
+        return () => {
+            serviceWorkerChannelCleanup();
+        }
     }, []);
+
+    useEffect(() => {
+        fileContentsRef.current = fileContents;
+    }, [fileContents]);
 
     return (
         <section className="flex flex-row">
@@ -57,7 +150,7 @@ export default function Editor() {
                             <FileExplorer />
                         </ReflexElement>
                         <ReflexSplitter />
-                        <ReflexElement className="middle-pane" minSize={350}>
+                        <ReflexElement className="middle-pane" size={0} minSize={0}>
                             <CodeEditor />
                         </ReflexElement>
                         <ReflexSplitter />

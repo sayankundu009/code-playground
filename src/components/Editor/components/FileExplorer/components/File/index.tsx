@@ -10,7 +10,7 @@ export default function File({ name, onClick }: React.PropsWithChildren<FileProp
             <a onClick={onClick}>
                 <FileIcon type={extension} />
                 
-                <span className="ml-1">
+                <span className="pl-1">
                     {name}
                 </span>
             </a>

@@ -44,13 +44,10 @@ function removeTrailingSlash(path = ""){
 }
 
 self.addEventListener('install', event => {
-    console.log("Installed");
     self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-    console.log("Activate")
-});
+self.addEventListener('activate', event => {});
 
 self.addEventListener('fetch', event => {
     const requestURL = new URL(event.request.url);

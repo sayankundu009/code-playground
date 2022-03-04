@@ -22,10 +22,20 @@ export default function Browser() {
     }
 
     function openPreviewWindow() {
+        const previewPath = `${PREVIEW_URL_PREFIX}${currentUrlPath}`;
+
         if (previewWindow.current && !previewWindow.current?.closed) {
-            previewWindow.current.focus()
+            previewWindow.current.focus();
+
+            if (previewWindow.current.location) {
+                const windowPathName = previewWindow.current.location.pathname;
+
+                if (windowPathName !== previewPath) {
+                    previewWindow.current.location.href = previewPath
+                }
+            }
         } else {
-            previewWindow.current = window.open(`${PREVIEW_URL_PREFIX}${currentUrlPath}`)
+            previewWindow.current = window.open(previewPath)
         }
     }
 

@@ -1,9 +1,10 @@
 import MonacoEditor from "@monaco-editor/react";
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useDebounce from "../../../../hooks/useDebounce";
 import { useFiles } from "../../../../store/selectors/editor";
 import { useDispatch } from "react-redux";
 import { setFileContent } from "../../../../store/slices/editor";
+import { File } from "../../../../types";
 
 function DefaultPreview() {
     return (
@@ -15,23 +16,30 @@ function DefaultPreview() {
 
 export default function CodeEditor() {
     const { currentSelectedFile } = useFiles();
+    const currentSelectedFileRef = useRef<File | null>(null);
+    const editorRef = useRef<any | null>(null);
     const dispatch = useDispatch();
 
     const handleUpdateFileContent = useDebounce((path, content) => {
         dispatch(setFileContent({ path, content }))
     }, 500);
 
-    const editorRef = useRef<any | null>(null);
-
-    function editorOnMount(editor: any) {
+    const editorOnMount = useCallback((editor: any) => {
         editorRef.current = editor;
-    }
 
-    function editorOnChange(value: string = "") {
-        if (currentSelectedFile) {
-            handleUpdateFileContent(currentSelectedFile.path, value)
-        }
-    }
+        editor.onDidChangeModelContent(() => {
+            if (currentSelectedFileRef.current) {
+                const content = editor.getValue();
+                const path = currentSelectedFileRef.current?.path;
+
+                handleUpdateFileContent(path, content);
+            }
+        });
+    }, [currentSelectedFileRef.current])
+
+    useEffect(() => {
+        currentSelectedFileRef.current = currentSelectedFile;
+    }, [currentSelectedFile])
 
     return (
         <div className="h-full overflow-hidden">
@@ -41,11 +49,10 @@ export default function CodeEditor() {
                 <MonacoEditor
                     height="100%"
                     theme="vs-dark"
-                    path={currentSelectedFile?.name}
+                    path={currentSelectedFile?.path}
                     language={currentSelectedFile?.language || "html"}
                     value={currentSelectedFile?.content || ""}
                     onMount={editorOnMount}
-                    onChange={editorOnChange}
                 />
             </div>
         </div>

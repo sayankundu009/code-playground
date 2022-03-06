@@ -1,0 +1,42 @@
+.editor-header-tabs-section{
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.editor-header-tabs-section::-webkit-scrollbar{
+    height: 5px;
+}
+
+.editor-header-tabs-section::-webkit-scrollbar-track {
+    background-color: var(--main-darker);
+}
+
+.editor-header-tabs-section::-webkit-scrollbar-thumb {
+    background-color: var(--secondary);
+    border-radius: 10px;
+}
+
+.editor-header-tab-close-button{
+    opacity: 0;
+    transition: opacity .1s;
+    margin-left: 6px;
+}
+
+.editor-header-tab-close-button button{
+    padding: 1px;
+    transition: background-color .1s;
+}
+
+.editor-header-tab-close-button button:hover{
+    border-radius: 5px;
+    background-color: var(--secondary);
+}
+
+.editor-header-tab:hover .editor-header-tab-close-button{
+    opacity: 1;
+}
+
+.editor-header-tab.active .editor-header-tab-close-button{
+    opacity: 1;
+}

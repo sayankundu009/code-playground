@@ -10,6 +10,10 @@ export function log(...args: any[]) {
     }
 }
 
+export function getFileName(path: string = "") {
+    return path.split("/").pop() ?? ""
+}
+
 export function getFileExtension(name: string = ""): string {
     return name.slice((name.lastIndexOf(".") - 1 >>> 0) + 2) || "";
 }
@@ -50,15 +54,9 @@ export function addToHeadStart(content: string, html: string) {
 
     const headEndIndex = html.indexOf(HEAD_TAG) + HEAD_TAG.length;
 
-    if (headEndIndex < 0) {
-        return '<head>' + content + '</head>' + html;
-    }
+    if (headEndIndex < 0)  return '<head>' + content + '</head>' + html;
 
-    const out =
-        html.slice(0, headEndIndex) +
-        content +
-        html.slice(headEndIndex);
-    return out;
+    return html.slice(0, headEndIndex) + content + html.slice(headEndIndex);
 }
 
 export function constructPath(files: StructureList, path: string = "", pathObject: { [key: string]: string } = {}) {
@@ -96,6 +94,6 @@ export function onIframeReady(iframe: HTMLIFrameElement | null) {
     })
 }
 
-export function removeTrailingSlash(path = ""){
+export function removeTrailingSlash(path = "") {
     return path.replace(/\/$/, "") || "/";
 }

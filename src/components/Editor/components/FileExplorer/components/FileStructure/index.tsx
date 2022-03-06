@@ -5,11 +5,11 @@ import File from "../File";
 import Folder from "../Folder";
 
 export default function FileStructure({ files = [], onFileSelect = () => { }, path = "" }: PropsWithChildren<FileStructureProps>): ReactNode | any {
-    function handleFileSelect(file: Structure) {
+    function handleFileSelect(fileName: string) {
         onFileSelect({
-            name: file.name,
-            path: `${path}/${file.name}`
-        })
+            name: fileName,
+            path: `${path}/${fileName}`
+        });
     }
 
     const sortedFiles = useMemo(() => {
@@ -33,12 +33,12 @@ export default function FileStructure({ files = [], onFileSelect = () => { }, pa
             {sortedFiles.map((file) => {
                 if (file.type == "folder") {
                     return (
-                        <Folder name={file.name} key={file.name}>
-                            <FileStructure files={file.children || []} onFileSelect={onFileSelect} path={`${path}/${file.name}`} />
+                        <Folder name={file.name} key={`${path}/${file.name}`}>
+                            <FileStructure files={file.children} onFileSelect={onFileSelect} path={`${path}/${file.name}`} />
                         </Folder>
                     )
                 } else {
-                    return <File name={file.name} key={file.name} onClick={() => handleFileSelect(file)} />
+                    return <File name={file.name} key={`${path}/${file.name}`} onFileClick={handleFileSelect} />
                 }
             })}
         </ul>

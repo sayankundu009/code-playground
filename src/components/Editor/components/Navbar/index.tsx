@@ -1,6 +1,6 @@
 export default function Navbar() {
     return (
-        <nav className="navbar bg-main text-neutral-content border-b border-gray-600" style={{minHeight: "3rem", height: "3rem"}}>
+        <nav className="navbar bg-main text-neutral-content border-b border-main" style={{minHeight: "3rem", height: "3rem"}}>
             <div className="flex-none px-2 mx-2">
                 <span className="text-lg font-bold" role="button">
                     Untitled

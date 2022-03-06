@@ -6,6 +6,8 @@
     --main: #202124;
     --main-darker: #1e1e1e;
     --secondary: #303134;
+    --secondary-darker: #2021246a;
+    --border-color: #343434;
 }
 
 .bg-main{
@@ -20,8 +22,16 @@
     background-color: var(--secondary);
 }
 
+.bg-secondary-darker{
+    background-color: var(--secondary-darker);
+}
+
+.border-main{
+    border-color: var(--border-color);
+}
+
 .reflex-splitter {
-    border-color: #303030 !important;
+    border-color: var(--border-color) !important;
     outline: none !important;
     transition: outline .1s !important;
 }

@@ -35,7 +35,7 @@ export default function Addressbar({ isIframeLoaded, currentUrlPath = "/", reloa
     }, [currentUrlPath]);
 
     return (
-        <section className="bg-main text-neutral-content border-b border-gray-600 p-1 flex" style={{ height: "2.1rem" }}>
+        <section className="bg-main text-neutral-content border-b border-main p-1 flex" style={{ height: "2.1rem" }}>
             <div className="flex">
                 <span role="button" className="pl-1 flex flex-col justify-center" title="Reload" onClick={handleReloadEvent}>
                     {isIframeLoaded ? <ReloadIcon /> : <CrossIcon />}

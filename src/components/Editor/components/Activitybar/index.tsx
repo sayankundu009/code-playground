@@ -3,7 +3,7 @@ import "./index.css";
 
 export default function Activitybar() {
     return (
-        <section className="activity-bar h-screen w-16 bg-main border-r border-gray-600 shadow">
+        <section className="activity-bar h-screen w-16 bg-main border-r border-main shadow">
             <IconButton>
                 <span style={{fontSize: 25}} className="mt-4">👨‍💻</span>    
             </IconButton>

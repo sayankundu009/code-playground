@@ -9,7 +9,7 @@ export default function Folder({ name, children }: React.PropsWithChildren<Folde
         <li>
             <a onClick={() => setIsOpen((open) => !open)}>
                 <FileIcon type="folder" />
-                <span className="ml-1">
+                <span>
                     {name}
                 </span>
             </a>

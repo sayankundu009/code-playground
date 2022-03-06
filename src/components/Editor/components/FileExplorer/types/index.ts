@@ -5,7 +5,7 @@ export type FileIconProps = {
 }
 
 export type FileStructureProps = {
-    files: StructureList;
+    files?: StructureList;
     path?: string;
     onFileSelect: (file: { name: string, path: string }) => void;
 }
@@ -16,5 +16,5 @@ export type FolderProps = {
 
 export type FileProps = {
     name: string,
-    onClick: () => void,
+    onFileClick: (fileName: string) => void,
 }

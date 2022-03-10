@@ -1,4 +1,8 @@
-document.write(`<base href="${window.location.origin}/preview/">`);
+const base = document.createElement("base");
+
+base.setAttribute("href", `${window.location.origin}/preview/`);
+
+document.head.prepend(base);
 
 const channel = new BroadcastChannel("code-playground-preview");
 

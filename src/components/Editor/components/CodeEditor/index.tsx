@@ -19,7 +19,6 @@ function DefaultPreview() {
 
 export default function CodeEditor() {
     const { currentSelectedFile } = useFiles();
-    const currentSelectedFileRef = useRef<File | null>(null);
     const editorRef = useRef<any | null>(null);
     const monacoRef = useRef<Monaco | null>(null);
     const [isEditorMounted, setIsEditorMounted] = useState(false);
@@ -88,20 +87,20 @@ export default function CodeEditor() {
                     model.dispose();
 
                     setOpenFiles(openFiles => openFiles.filter(filePath => filePath !== path));
-                    
-                    if(currentlyOpenedFilePath === path){
+
+                    if (currentlyOpenedFilePath === path) {
                         setCurrentlyOpenedFilePath("");
                     }
-                    
-                    if(length > 1 && currentlyOpenedFilePath === path){
+
+                    if (length > 1 && currentlyOpenedFilePath === path) {
                         const modelIndex = index == 0 ? index + 1 : index - 1;
                         const modelToOpen = models[modelIndex];
 
-                        if(modelToOpen){
+                        if (modelToOpen) {
                             openFileIntoEditor(modelToOpen.uri.path)
                         }
                     }
-                   
+
                     break;
                 }
             }

@@ -3,6 +3,9 @@ import Addressbar from "./components/Addressbar";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFileContents, useFiles } from "../../../../store/selectors/editor";
 import { onIframeReady, PREVIEW_URL_PREFIX, removeTrailingSlash } from "../../../../utils";
+import Console from "./components/Console";
+
+const CONSOLE_CLEAR_LOG = { method: "log", data: ["%cConsole was cleared", "font-style: italic;color: #8e8e90;"] }
 
 export default function Browser() {
     const { files, isFilesLoaded } = useFiles();
@@ -13,6 +16,7 @@ export default function Browser() {
     const iframe = useRef<HTMLIFrameElement | null>(null);
     const [isIframeLoaded, setIsIframeLoaded] = useState(false);
     const [currentUrlPath, setCurrentUrlPath] = useState("/");
+    const [consoleLogs, setConsoleLogs] = useState<any>([])
 
     function sendMessage(action: string, payload: any = {}) {
         channel.current?.postMessage({
@@ -56,6 +60,8 @@ export default function Browser() {
             });
 
             setTimeout(handlePreviewUrlChange, 0);
+            
+            clearConsole();
         }
     }
 
@@ -108,8 +114,26 @@ export default function Browser() {
         setIsIframeLoadEventListener();
     }, []);
 
+    function clearConsole(showConsoleClearMessage: boolean = false) {
+        setConsoleLogs(showConsoleClearMessage ? [CONSOLE_CLEAR_LOG] : [])
+    }
+
     useEffect(() => {
         channel.current = new BroadcastChannel("code-playground-preview");
+
+        channel.current.addEventListener("message", ({ data }) => {
+            const { action, payload } = data;
+
+            switch (action) {
+                case "CONSOLE": {
+                    if (payload.method === 'clear') {
+                        return clearConsole(true);
+                    }
+
+                    setConsoleLogs((currLogs: any) => [...currLogs, payload]);
+                }
+            }
+        });
 
         return () => {
             channel.current?.close();
@@ -121,7 +145,7 @@ export default function Browser() {
     }, [fileContents, files, isFilesLoaded]);
 
     return (
-        <div className="h-full w-full">
+        <div className="browser-section h-full w-full">
             <Addressbar
                 isIframeLoaded={isIframeLoaded}
                 reloadPreview={reloadPreview}
@@ -132,6 +156,8 @@ export default function Browser() {
             />
 
             {isFilesLoaded && <Preview ref={onIframeMount} />}
+
+            <Console logs={consoleLogs} />
         </div>
     )
 }

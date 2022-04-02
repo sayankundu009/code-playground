@@ -102,7 +102,7 @@ export default function Editor() {
                     if (content !== null) {
                         switch (extension) {
                             case "html": {
-                                content = addToHeadStart(`<script src="/js/inject.js"></script>`, content);
+                                content = addToHeadStart(`<script src="/lib/playground-hooks.js"></script>`, content);
                             }
                         }
                     }
@@ -145,7 +145,7 @@ export default function Editor() {
             <section className="h-screen w-full">
                 <Navbar />
                 <section style={{ height: "calc(100% - 3rem)" }}>
-                    <ReflexContainer orientation="vertical">
+                    <ReflexContainer orientation="vertical" windowResizeAware={true}>
                         <ReflexElement className="left-pane" maxSize={250}>
                             <FileExplorer />
                         </ReflexElement>

@@ -19,6 +19,6 @@
       "node"
     ],
   },
-  "include": ["./src", "./preview"],
+  "include": ["./src", "./lib"],
   "exclude": ["node_modules/**/*"]
 }

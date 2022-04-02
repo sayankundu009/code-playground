@@ -36,12 +36,6 @@
     transition: outline .1s !important;
 }
 
-.reflex-splitter:hover {
-    outline: 3px solid #2563eb !important;
-    outline-offset: -4px !important;
-}
-
-.reflex-splitter.active {
-    outline: 3px solid #2563eb !important;
-    outline-offset: -4px !important;
+.browser-section{
+    background: var(--main);
 }

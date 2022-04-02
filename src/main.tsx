@@ -11,6 +11,12 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
+declare global {
+  interface Window {
+    console: any;
+  }
+}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then((worker) => {
     log('Service worker registered', worker.scope);

@@ -26,9 +26,21 @@ function setupConsole() {
         try {
             postMessage("CONSOLE", log);
         } catch (err) {
-            console.error("Error occurred: Couldn't log this message");
+            postMessage("CONSOLE", {
+                method: "error",
+                data: ["Error occurred: Couldn't log this message"]
+            });
         }
     }, false);
+}
+
+function setupErrorHandler() {
+    window.addEventListener("error", function (event) {
+        postMessage("CONSOLE", {
+            method: "error",
+            data: [event.message]
+        });
+    });
 }
 
 const channel = new BroadcastChannel("code-playground-preview");
@@ -42,6 +54,8 @@ channel.addEventListener("message", ({ data }) => {
 createBaseTag();
 
 setupConsole();
+
+setupErrorHandler();
 
 setTimeout(() => {
     setPageTitle();

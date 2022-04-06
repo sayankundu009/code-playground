@@ -15,7 +15,7 @@ import { useDispatch } from "react-redux";
 import { setFileContents, setFiles, setIsFilesLoaded } from "../../store/slices/editor";
 import { FileContent, StructureList } from "../../types";
 import { useFileContents } from "../../store/selectors/editor";
-import { addToHeadStart, getFileExtension, isFilePath, logRequests } from "../../utils";
+import { addToHeadStart, getFileExtension, isFilePath, logRequests, renderImageInConsole } from "../../utils";
 
 import 'react-reflex/styles.css';
 
@@ -125,10 +125,16 @@ export default function Editor() {
         }
     }
 
+    function greetInConsole() {
+        renderImageInConsole("https://c.tenor.com/gfGqkxug_M4AAAAC/waving-bear.gif");
+    }
+
     useEffect(() => {
         setupProjectFiles();
 
         const serviceWorkerChannelCleanup = setupServiceWorkerBroadcastChannel();
+
+        greetInConsole();
 
         return () => {
             serviceWorkerChannelCleanup();

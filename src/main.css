@@ -7,11 +7,16 @@
     --main-darker: #1e1e1e;
     --secondary: #303134;
     --secondary-darker: #2021246a;
+    --primary: #38ef7d;
     --border-color: #343434;
 }
 
 .bg-main{
     background-color: var(--main);
+}
+
+.bg-primary{
+    background-color: var(--primary);
 }
 
 .bg-main-darker{

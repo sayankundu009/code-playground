@@ -1,7 +1,8 @@
 import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
-import { Console } from 'console-feed'
-import "./index.css";
+import Console from 'console-feed/lib/Component'
 import { useEffect, useRef } from "react";
+import ClearIcon from "./components/ClearIcon";
+import "./index.css";
 
 const CONSOLE_MIN_SIZE = 28;
 const CONSOLE_MAX_SIZE = 500;
@@ -43,6 +44,13 @@ export default function ({ logs }: { logs: any }) {
                     <header className="bg-main" style={{ height: CONSOLE_MIN_SIZE }}>
                         <h6 className="text-sm text-white p-1 pl-3">Console</h6>
                     </header>
+                    <div className="bg-main flex border-t border-main p-1 hidden">
+                        <div className="pl-1">
+                            <span role="button" className="pl-1 flex flex-col justify-center">
+                                <ClearIcon />
+                            </span>
+                        </div>
+                    </div>
                     <main className="editor-console-preview bg-main-darker h-full overflow-auto" ref={consolePreviewRef}>
                         <Console logs={logs} variant="dark" />
                     </main>

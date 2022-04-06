@@ -32,6 +32,9 @@
     border-radius: 5px;
     background-color: var(--secondary);
 }
+.editor-header-tab.active{
+    border-bottom: 2.2px solid var(--primary);
+}
 
 .editor-header-tab:hover .editor-header-tab-close-button{
     opacity: 1;
@@ -39,4 +42,8 @@
 
 .editor-header-tab.active .editor-header-tab-close-button{
     opacity: 1;
+}
+
+.editor-default-preview .default-icon-path{
+   fill: var(--primary);
 }

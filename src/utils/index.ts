@@ -54,7 +54,7 @@ export function addToHeadStart(content: string, html: string) {
 
     const headEndIndex = html.indexOf(HEAD_TAG) + HEAD_TAG.length;
 
-    if (headEndIndex < 0)  return '<head>' + content + '</head>' + html;
+    if (headEndIndex < 0) return "<head>" + content + "</head>" + html;
 
     return html.slice(0, headEndIndex) + content + html.slice(headEndIndex);
 }
@@ -96,4 +96,26 @@ export function onIframeReady(iframe: HTMLIFrameElement | null) {
 
 export function removeTrailingSlash(path = "") {
     return path.replace(/\/$/, "") || "/";
+}
+
+// https://github.com/YannickDot/console.image
+export function renderImageInConsole(url: string, scale = 0.4) {
+    const img = new Image();
+
+    img.onload = () => {
+        const style = `
+            display: block !important;
+            font-size: ${img.height * scale}px;
+            padding: ${Math.floor(img.height * scale / 2)}px ${Math.floor(img.width * scale / 2)}px;
+            background: url(${url});
+            background-size: ${img.width * scale}px ${img.height * scale}px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+        `;
+
+        console.log('%c ', style);
+    }
+
+    img.src = url;
 }

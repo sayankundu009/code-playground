@@ -27,7 +27,7 @@
         {
           "name": "main.js",
           "type": "file",
-          "content": "const button = document.querySelector('button');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n\tbutton.innerText = `Clicked ${++count}`;\n\n\tconsole.log(\"Count: \", count)\n});"
+          "content": "const button = document.querySelector('button');\n\nlet count = 0;\n\nbutton.addEventListener('click', () => {\n\tbutton.innerText = `Clicked ${++count}`;\n\n\tconsole.log(\"Count: \", count)\n});\n\n"
         }
       ]
     },

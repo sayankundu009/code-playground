@@ -10,3 +10,15 @@
     justify-content: center;
     border-radius: 9999px;
 }
+
+.activity-bar .icon-button .icon-button-holder.active{
+    background-color: var(--main);
+}
+
+.activity-bar .icon-button .icon-button-holder.active{
+    background-color: var(--primary);
+}
+
+.activity-bar .icon-button .icon-button-holder.active svg .icon-path{
+    fill: #000000;
+}

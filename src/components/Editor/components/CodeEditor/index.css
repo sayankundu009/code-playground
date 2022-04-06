@@ -43,7 +43,3 @@
 .editor-header-tab.active .editor-header-tab-close-button{
     opacity: 1;
 }
-
-.editor-default-preview .default-icon-path{
-   fill: var(--primary);
-}

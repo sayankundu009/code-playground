@@ -1,14 +1,25 @@
 import { ReflexContainer, ReflexElement, ReflexSplitter } from "react-reflex";
 import Console from 'console-feed/lib/Component'
-import { useEffect, useRef } from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
 import ClearIcon from "./components/ClearIcon";
 import "./index.css";
 
 const CONSOLE_MIN_SIZE = 28;
 const CONSOLE_MAX_SIZE = 500;
 
-export default function ({ logs }: { logs: any }) {
+type Props = {
+    logs: any,
+    clearConsoleOnReload: boolean,
+    clearConsole: () => void,
+    clearConsoleOnReloadInput: (shouldClearOnReload: boolean) => void,
+}
+
+export default function ({ logs, clearConsoleOnReload, clearConsole, clearConsoleOnReloadInput }: Props) {
     const consolePreviewRef = useRef<HTMLDivElement | null>(null);
+
+    function handleClearConsoleOnReloadInput(event: ChangeEvent<HTMLInputElement>) {
+        clearConsoleOnReloadInput(event.target.checked)
+    }
 
     useEffect(() => {
         if (consolePreviewRef.current) {
@@ -44,11 +55,20 @@ export default function ({ logs }: { logs: any }) {
                     <header className="bg-main" style={{ height: CONSOLE_MIN_SIZE }}>
                         <h6 className="text-sm text-white p-1 pl-3">Console</h6>
                     </header>
-                    <div className="bg-main flex border-t border-main p-1 hidden">
+                    <div className="bg-main flex border-t border-main p-1 items-center">
                         <div className="pl-1">
-                            <span role="button" className="pl-1 flex flex-col justify-center">
+                            <span role="button" className="pl-1 flex flex-col justify-center clear-console-button" onClick={clearConsole}>
                                 <ClearIcon />
                             </span>
+                        </div>
+                        <div className="mx-2 border-l border-main py-2"></div>
+                        <div>
+                            <div className="form-control">
+                                <label className="label cursor-pointer p-0 clear-console-checkbox-label">
+                                    <input type="checkbox" checked={clearConsoleOnReload} className="checkbox checkbox-xs border-main clear-console-checkbox" onChange={handleClearConsoleOnReloadInput} />
+                                    <span className="label-text text-white ml-2">Clear console on reload</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <main className="editor-console-preview bg-main-darker h-full overflow-auto" ref={consolePreviewRef}>

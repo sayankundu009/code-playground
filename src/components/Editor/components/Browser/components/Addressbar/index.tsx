@@ -48,7 +48,7 @@ export default function Addressbar({ isIframeLoaded, currentUrlPath = "/", reloa
                             <span>http://localhost</span>
                             <input type="text"
                                 value={urlInput}
-                                className="address-bar-input bg-secondary text-white outline-none"
+                                className="address-bar-input bg-secondary text-white outline-none w-full"
                                 style={{ height: "1.5rem" }}
                                 onChange={handleUrlInput}
                             />

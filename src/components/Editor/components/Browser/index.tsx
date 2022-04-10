@@ -1,11 +1,12 @@
 import Preview from "./components/Preview";
 import Addressbar from "./components/Addressbar";
+import Console from "./components/Console";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFileContents, useFiles } from "../../../../store/selectors/editor";
-import { onIframeReady, PREVIEW_URL_PREFIX, removeTrailingSlash } from "../../../../utils";
-import Console from "./components/Console";
+import { getLocalStorage, onIframeReady, PREVIEW_URL_PREFIX, removeTrailingSlash, setLocalStorage } from "../../../../utils";
 
 const CONSOLE_CLEAR_LOG = { method: "log", data: ["%cConsole was cleared", "font-style: italic;color: #8e8e90;"] }
+const CLEAR_CONSOLE_ON_RELOAD_LOCAL_STORAGE_KEY = "clear-console-on-reload";
 
 export default function Browser() {
     const { files, isFilesLoaded } = useFiles();
@@ -16,7 +17,9 @@ export default function Browser() {
     const iframe = useRef<HTMLIFrameElement | null>(null);
     const [isIframeLoaded, setIsIframeLoaded] = useState(false);
     const [currentUrlPath, setCurrentUrlPath] = useState("/");
-    const [consoleLogs, setConsoleLogs] = useState<any>([])
+    const [consoleLogs, setConsoleLogs] = useState<any>([]);
+    const [clearConsoleOnReload, setClearConsoleOnReload] = useState<boolean>(true);
+    const clearConsoleOnReloadRef = useRef<boolean>(true);
 
     function sendMessage(action: string, payload: any = {}) {
         channel.current?.postMessage({
@@ -60,8 +63,10 @@ export default function Browser() {
             });
 
             setTimeout(handlePreviewUrlChange, 0);
-            
-            clearConsole();
+
+            if (clearConsoleOnReloadRef.current) {
+                clearConsole();
+            }
         }
     }
 
@@ -108,15 +113,33 @@ export default function Browser() {
         }
     }
 
+    function setupClearConsoleOnReload() {
+        const shouldClearOnReload = getLocalStorage(CLEAR_CONSOLE_ON_RELOAD_LOCAL_STORAGE_KEY);
+
+        if(shouldClearOnReload !== null){
+            setClearConsoleOnReloadValues(Boolean(shouldClearOnReload));
+        }
+    }
+
+    function setClearConsoleOnReloadValues(shouldClearOnReload: boolean) {
+        setClearConsoleOnReload(shouldClearOnReload);
+        clearConsoleOnReloadRef.current = shouldClearOnReload;
+    }
+
+    const clearConsole = useCallback((showConsoleClearMessage: boolean = false) => {
+        setConsoleLogs(showConsoleClearMessage ? [CONSOLE_CLEAR_LOG] : [])
+    }, []);
+
     const onIframeMount = useCallback((iframeElement: HTMLIFrameElement) => {
         iframe.current = iframeElement;
 
         setIsIframeLoadEventListener();
     }, []);
 
-    function clearConsole(showConsoleClearMessage: boolean = false) {
-        setConsoleLogs(showConsoleClearMessage ? [CONSOLE_CLEAR_LOG] : [])
-    }
+    const handleClearConsoleOnReloadInput = useCallback((shouldClearOnReload: boolean) => {
+        setClearConsoleOnReloadValues(shouldClearOnReload);
+        setLocalStorage(CLEAR_CONSOLE_ON_RELOAD_LOCAL_STORAGE_KEY, shouldClearOnReload);
+    }, []);
 
     useEffect(() => {
         channel.current = new BroadcastChannel("code-playground-preview");
@@ -134,6 +157,8 @@ export default function Browser() {
                 }
             }
         });
+
+        setupClearConsoleOnReload();
 
         return () => {
             channel.current?.close();
@@ -157,7 +182,12 @@ export default function Browser() {
 
             {isFilesLoaded && <Preview ref={onIframeMount} />}
 
-            <Console logs={consoleLogs} />
+            <Console
+                logs={consoleLogs}
+                clearConsole={clearConsole}
+                clearConsoleOnReload={clearConsoleOnReload}
+                clearConsoleOnReloadInput={handleClearConsoleOnReloadInput}
+            />
         </div>
     )
 }

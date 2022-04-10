@@ -10,3 +10,30 @@
     background-color: var(--secondary);
     border-radius: 10px;
 }
+
+.editor-console .clear-console-button{
+    opacity: 60%;   
+    transition: opacity 0.2s;
+}
+
+.editor-console .clear-console-button:hover{
+    opacity: 100%;   
+}
+
+.editor-console .clear-console-checkbox-label{
+    opacity: 80%;   
+    transition: opacity 0.2s;
+}
+
+.editor-console .clear-console-checkbox-label:hover{
+    opacity: 100%;   
+}
+
+.editor-console .clear-console-checkbox{
+    border-radius: 5px;   
+}
+
+.editor-console .clear-console-checkbox:checked{
+    border: none !important;
+    background-image: linear-gradient(-45deg, #99141400 65%, var(--primary) 0), linear-gradient(45deg, transparent 75%, var(--primary) 0), linear-gradient(-45deg, var(--primary) 40%, transparent 0), linear-gradient(45deg, var(--primary) 30%, var(--main) 0, var(--main) 40%, transparent 0), linear-gradient(-45deg, var(--main) 50%, var(--primary) 0);;
+}

@@ -1,0 +1,20 @@
+.menu li a{
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+    transition-duration: .1s !important;
+    opacity: 90%;
+}
+
+.menu li a:hover{
+    opacity: 100%;
+}
+
+.menu li a:active{
+    opacity: 100%;
+    background-color: var(--secondary);
+}
+
+.menu li a.selected{
+    opacity: 100%;
+    background-color: var(--secondary);
+}

@@ -5,10 +5,10 @@
   "author": "Sayan Kundu",
   "scripts": {
     "start": "vite preview",
-    "dev": "npm-run-all --parallel dev:main dev:lib",
-    "build": "npm-run-all build:lib build:main",
-    "dev:main": "vite",
-    "build:main": "tsc && vite build",
+    "dev": "npm-run-all --parallel dev:app dev:lib",
+    "build": "npm-run-all build:lib build:app",
+    "dev:app": "vite",
+    "build:app": "tsc && vite build",
     "dev:lib": "rollup -c lib/rollup.config.js -w",
     "build:lib": "rollup -c lib/rollup.config.js"
   },

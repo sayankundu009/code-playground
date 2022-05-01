@@ -13,7 +13,6 @@ export type FileContent = {
 
 export type File = {
     name: string,
-    content: string,
     language: string,
     path?: string
 }
@@ -21,6 +20,7 @@ export type File = {
 export type EditorState = {
     files: StructureList,
     currentSelectedFile: File | null,
+    currentSelectedPath: string,
     fileContents: FileContent,
     isFilesLoaded: boolean,
 }

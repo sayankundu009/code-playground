@@ -1,4 +1,4 @@
-import FileExplorer from "./components/FileExplorer";
+import Explorer from "./components/Explorer";
 import CodeEditor from "./components/CodeEditor";
 import Activitybar from "./components/Activitybar";
 import Navbar from "./components/Navbar";
@@ -153,7 +153,7 @@ export default function Editor() {
                 <section style={{ height: "calc(100% - 3rem)" }}>
                     <ReflexContainer orientation="vertical" windowResizeAware={true}>
                         <ReflexElement className="left-pane" maxSize={250}>
-                            <FileExplorer />
+                            <Explorer />
                         </ReflexElement>
                         <ReflexSplitter />
                         <ReflexElement className="middle-pane" size={0} minSize={0}>

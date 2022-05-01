@@ -1,13 +1,14 @@
 import MonacoEditor, { Monaco } from "@monaco-editor/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useDebounce from "../../../../hooks/useDebounce";
-import { useFiles } from "../../../../store/selectors/editor";
+import { useFileContents, useFiles } from "../../../../store/selectors/editor";
 import { useDispatch } from "react-redux";
-import { setFileContent } from "../../../../store/slices/editor";
+import { setCurrentSelectedFile, setFileContent } from "../../../../store/slices/editor";
 import { File } from "../../../../types";
 import EditorHeader from "./components/EditorHeader";
 
 import "./index.css";
+import { getFileName, getLanguage } from "../../../../utils";
 
 function DefaultPreview() {
     return (
@@ -18,13 +19,17 @@ function DefaultPreview() {
 }
 
 export default function CodeEditor() {
-    const { currentSelectedFile } = useFiles();
     const editorRef = useRef<any | null>(null);
     const monacoRef = useRef<Monaco | null>(null);
     const [isEditorMounted, setIsEditorMounted] = useState(false);
     const [openFiles, setOpenFiles] = useState<Array<string>>([]);
-    const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<string>("");
+    const { currentSelectedFile } = useFiles();
+    const fileContents = useFileContents();
     const dispatch = useDispatch();
+
+    function getFileContent(key: string) {
+        return fileContents[key] || "";
+    }
 
     const handleUpdateFileContent = useDebounce((path, content) => {
         dispatch(setFileContent({ path, content }))
@@ -48,30 +53,37 @@ export default function CodeEditor() {
 
     function createEditorModel(file: File) {
         const monaco = monacoRef.current;
-        let model = null;
 
         if (monaco && file.path) {
-            model = monaco.Uri.file(file.path);
+            const model = monaco.Uri.file(file.path);
 
             monaco.editor.createModel(
-                file.content,
+                getFileContent(file.path),
                 file.language,
                 model
-            )
+            );
+
+            return model;
         }
 
-        return model;
+        return null;
     }
 
     const openFileIntoEditor = useCallback((path: string) => {
+        if (currentSelectedFile?.path === path) return;
+
         const monaco = monacoRef.current;
 
         if (monaco) {
             const modelUri = monaco.Uri.file(path);
-            editorRef.current.setModel(monaco.editor.getModel(modelUri))
-            setCurrentlyOpenedFilePath(modelUri.path);
+            editorRef.current.setModel(monaco.editor.getModel(modelUri));
+            dispatch(setCurrentSelectedFile({
+                name: getFileName(modelUri.path),
+                language: getLanguage(modelUri.path),
+                path: modelUri.path,
+            }));
         }
-    }, [monacoRef, editorRef]);
+    }, [monacoRef, editorRef, currentSelectedFile]);
 
     const closeFile = useCallback((path: string) => {
         const monaco = monacoRef.current;
@@ -79,6 +91,7 @@ export default function CodeEditor() {
         if (monaco) {
             const models = monaco.editor.getModels();
             const length = models.length;
+            const currentlyOpenFilePath = currentSelectedFile?.path
 
             for (let index = 0; index < length; index++) {
                 const model = models[index];
@@ -88,11 +101,11 @@ export default function CodeEditor() {
 
                     setOpenFiles(openFiles => openFiles.filter(filePath => filePath !== path));
 
-                    if (currentlyOpenedFilePath === path) {
-                        setCurrentlyOpenedFilePath("");
+                    if (currentlyOpenFilePath === path) {
+                        dispatch(setCurrentSelectedFile(null));
                     }
 
-                    if (length > 1 && currentlyOpenedFilePath === path) {
+                    if (length > 1 && currentlyOpenFilePath === path) {
                         const modelIndex = index == 0 ? index + 1 : index - 1;
                         const modelToOpen = models[modelIndex];
 
@@ -105,7 +118,7 @@ export default function CodeEditor() {
                 }
             }
         }
-    }, [monacoRef, editorRef, currentlyOpenedFilePath]);
+    }, [monacoRef, editorRef, currentSelectedFile]);
 
     useEffect(() => {
         const monaco = monacoRef.current;
@@ -118,7 +131,6 @@ export default function CodeEditor() {
 
                 if (modelUri) {
                     editorRef.current.setModel(monaco.editor.getModel(modelUri));
-                    setCurrentlyOpenedFilePath(modelUri.path);
                     setOpenFiles(monaco.editor.getModels().map((modelItem) => modelItem.uri.path));
                 }
             } else {
@@ -138,7 +150,7 @@ export default function CodeEditor() {
             <div className="h-full" style={{ display: shouldShowEditor ? "block" : "none" }}>
                 <EditorHeader
                     files={openFiles}
-                    currentPath={currentlyOpenedFilePath}
+                    currentPath={currentSelectedFile?.path || ""}
                     openFileIntoEditor={openFileIntoEditor}
                     closeFile={closeFile}
                 />

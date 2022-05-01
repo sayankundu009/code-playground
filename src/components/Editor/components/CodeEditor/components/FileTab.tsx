@@ -1,7 +1,7 @@
 import { SyntheticEvent, useRef } from "react";
 import { getFileExtension, getFileName } from "../../../../../utils";
 import CloseIcon from "../../../../UI/Icons/Close";
-import FileIcon from "../../FileExplorer/components/FileIcon";
+import FileIcon from "../../Explorer/components/FileIcon";
 import { FileTab } from "../types";
 
 export default function ({ currentPath, path, openFileIntoEditor, closeFile }: FileTab) {

@@ -1,10 +1,9 @@
-import { PropsWithChildren, ReactNode, useMemo } from "react";
-import { Structure } from "../../../../../../types";
-import { FileStructureProps } from "../../types";
 import File from "../File";
 import Folder from "../Folder";
+import { PropsWithChildren, ReactNode, useMemo } from "react";
+import { FileExplorerProps } from "../../types";
 
-export default function FileStructure({ files = [], onFileSelect = () => { }, path = "" }: PropsWithChildren<FileStructureProps>): ReactNode | any {
+export default function FileExplorer({ files = [], onFileSelect = () => { }, path = "", selectedFilePath }: PropsWithChildren<FileExplorerProps>): ReactNode | any {
     function handleFileSelect(fileName: string) {
         onFileSelect({
             name: fileName,
@@ -12,6 +11,7 @@ export default function FileStructure({ files = [], onFileSelect = () => { }, pa
         });
     }
 
+    // !! Doesn't work with Mozilla !!
     const sortedFiles = useMemo(() => {
         return [...files].sort((fileOne, fileTwo) => {
             if (fileOne.type === "folder") {
@@ -34,11 +34,23 @@ export default function FileStructure({ files = [], onFileSelect = () => { }, pa
                 if (file.type == "folder") {
                     return (
                         <Folder name={file.name} key={`${path}/${file.name}`}>
-                            <FileStructure files={file.children} onFileSelect={onFileSelect} path={`${path}/${file.name}`} />
+                            <FileExplorer
+                                files={file.children}
+                                onFileSelect={onFileSelect}
+                                path={`${path}/${file.name}`}
+                                selectedFilePath={selectedFilePath}
+                            />
                         </Folder>
                     )
                 } else {
-                    return <File name={file.name} key={`${path}/${file.name}`} onFileClick={handleFileSelect} />
+                    return (
+                        <File
+                            name={file.name}
+                            key={`${path}/${file.name}`}
+                            onFileClick={handleFileSelect}
+                            active={`${path}/${file.name}` === selectedFilePath}
+                        />
+                    )
                 }
             })}
         </ul>

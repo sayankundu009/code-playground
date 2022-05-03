@@ -69,15 +69,15 @@ export default function CodeEditor() {
         return null;
     }
 
-    const openFileIntoEditor = useCallback((path: string) => {
-        if (currentSelectedFile?.path === path) return;
-
+    const openFileIntoEditor = useCallback((path: string, shouldUpdateCurrentSelectedFile: boolean = true) => {
         const monaco = monacoRef.current;
 
         if (monaco) {
             const modelUri = monaco.Uri.file(path);
             editorRef.current.setModel(monaco.editor.getModel(modelUri));
-            dispatch(setCurrentSelectedFile({
+
+            // TODO: Refactor currentSelectedFile state update 
+            shouldUpdateCurrentSelectedFile && dispatch(setCurrentSelectedFile({
                 name: getFileName(modelUri.path),
                 language: getLanguage(modelUri.path),
                 path: modelUri.path,
@@ -110,7 +110,7 @@ export default function CodeEditor() {
                         const modelToOpen = models[modelIndex];
 
                         if (modelToOpen) {
-                            openFileIntoEditor(modelToOpen.uri.path)
+                            openFileIntoEditor(modelToOpen.uri.path);
                         }
                     }
 
@@ -135,7 +135,7 @@ export default function CodeEditor() {
                 }
             } else {
                 if (currentSelectedFile.path) {
-                    openFileIntoEditor(currentSelectedFile.path);
+                    openFileIntoEditor(currentSelectedFile.path, false);
                 }
             }
         }

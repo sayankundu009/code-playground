@@ -32,6 +32,13 @@
     border-radius: 5px;
     background-color: var(--secondary);
 }
+
+.editor-header-tab{
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: .05s;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+}
+
 .editor-header-tab.active{
     border-bottom: 2.2px solid var(--primary);
 }

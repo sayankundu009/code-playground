@@ -1,0 +1,32 @@
+
+.file-explorer .menu ul{
+    padding-left: 0px !important;
+}
+
+.file-explorer .menu ul li a{ 
+    padding-left: 2.5rem;
+}
+
+.file-explorer .menu li a{
+    transition-duration: .05s !important;
+    opacity: 90%;
+}
+
+.file-explorer .menu li a{
+    padding-top: .3rem;
+    padding-bottom: .3rem;
+}
+
+.file-explorer .menu li a:hover{
+    opacity: 100%;
+}
+
+.file-explorer .menu li a.selected{
+    opacity: 100%;
+    background-color: var(--secondary);
+}
+
+.file-explorer .menu li a:active{
+    opacity: 100%;
+    background-color: var(--secondary);
+}

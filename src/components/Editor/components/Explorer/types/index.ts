@@ -8,11 +8,13 @@ export type FileExplorerProps = {
     files?: StructureList;
     path?: string;
     selectedFilePath: string | null; 
-    onFileSelect: (file: { name: string, path: string }) => void;
+    onFileSelect: (file: { name: string, path: string, type?: string}) => void;
 }
 
 export type FolderProps = {
     name: string,
+    active: boolean,
+    onClick: (fileName: string) => void,
 }
 
 export type FileProps = {

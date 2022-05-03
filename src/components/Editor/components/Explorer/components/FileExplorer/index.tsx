@@ -7,7 +7,16 @@ export default function FileExplorer({ files = [], onFileSelect = () => { }, pat
     function handleFileSelect(fileName: string) {
         onFileSelect({
             name: fileName,
-            path: `${path}/${fileName}`
+            path: `${path}/${fileName}`,
+            type: "file",
+        });
+    }
+
+    function handleFolderSelect(fileName: string){
+        onFileSelect({
+            name: fileName,
+            path: `${path}/${fileName}`,
+            type: "folder",
         });
     }
 
@@ -33,7 +42,7 @@ export default function FileExplorer({ files = [], onFileSelect = () => { }, pat
             {sortedFiles.map((file) => {
                 if (file.type == "folder") {
                     return (
-                        <Folder name={file.name} key={`${path}/${file.name}`}>
+                        <Folder name={file.name} key={`${path}/${file.name}`} active={`${path}/${file.name}` === selectedFilePath} onClick={handleFolderSelect}>
                             <FileExplorer
                                 files={file.children}
                                 onFileSelect={onFileSelect}

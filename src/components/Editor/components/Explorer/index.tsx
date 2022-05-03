@@ -12,23 +12,29 @@ export default function Explorer() {
 
     const dispatch = useDispatch();
 
-    const onFileSelect = useCallback((file: { name: string, path: string }) => {
-        dispatch(setCurrentSelectedFile({
-            name: file.name,
-            language: getLanguage(file.name),
-            path: file.path,
-        }));
+    const onFileSelect = useCallback((file: { name: string, path: string, type?: string }) => {
+        if (!file.type) return;
+
+        if (file.type === "file") {
+            dispatch(setCurrentSelectedFile({
+                name: file.name,
+                language: getLanguage(file.name),
+                path: file.path,
+            }));
+        } else if (file.type === "folder") {
+            dispatch(setCurrentSelectedPath(file.path || ""));
+        }
     }, []);
 
     useEffect(() => {
         dispatch(setCurrentSelectedPath(currentSelectedFile?.path || ""));
-    }, [currentSelectedFile])
+    }, [currentSelectedFile]);
 
     return (
         <section className="h-full bg-main overflow-hidden">
             <Header />
 
-            <section className="pt-2" style={{ width: "calc(100% + 200px)", userSelect: "none" }}>
+            <section className="pt-2 file-explorer" style={{ width: "calc(100% + 200px)", userSelect: "none" }}>
                 <FileExplorer files={files} onFileSelect={onFileSelect} selectedFilePath={currentSelectedPath} />
             </section>
         </section>

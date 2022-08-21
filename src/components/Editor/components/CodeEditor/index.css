@@ -35,7 +35,7 @@
 
 .editor-header-tab{
     transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-    transition-duration: .05s;
+    transition-duration: .06s;
     transition-timing-function: cubic-bezier(.4, 0, .2, 1);
 }
 

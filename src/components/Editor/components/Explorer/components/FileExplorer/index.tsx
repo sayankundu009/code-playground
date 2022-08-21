@@ -12,7 +12,7 @@ export default function FileExplorer({ files = [], onFileSelect = () => { }, pat
         });
     }
 
-    function handleFolderSelect(fileName: string){
+    function handleFolderSelect(fileName: string) {
         onFileSelect({
             name: fileName,
             path: `${path}/${fileName}`,
@@ -38,7 +38,7 @@ export default function FileExplorer({ files = [], onFileSelect = () => { }, pat
     }, [files]);
 
     return (
-        <ul className="menu text-white text-sm">
+        <ul className="menu text-white text-sm border-left">
             {sortedFiles.map((file) => {
                 if (file.type == "folder") {
                     return (

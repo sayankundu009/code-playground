@@ -1,3 +1,4 @@
+import "./index.css";
 import MonacoEditor, { Monaco } from "@monaco-editor/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useDebounce from "../../../../hooks/useDebounce";
@@ -7,7 +8,6 @@ import { setCurrentSelectedFile, setFileContent } from "../../../../store/slices
 import { File } from "../../../../types";
 import EditorHeader from "./components/EditorHeader";
 
-import "./index.css";
 import { getFileName, getLanguage } from "../../../../utils";
 
 function DefaultPreview() {

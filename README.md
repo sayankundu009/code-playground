@@ -1,5 +1,6 @@
 # Code Playground
 ![Demo](/docs/images/demo.gif)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/abc1c0e6-2268-48d2-a025-f05b48a9c20d/deploy-status)](https://app.netlify.com/sites/code-playground-app/deploys)
 ## Description
 [Code playground](https://code-playground-app.netlify.app/) is an online IDE where you can quickly prototype web apps, create projects & collaborate with others (soon)
 
